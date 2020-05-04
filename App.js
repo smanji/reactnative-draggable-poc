@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 import Draggable from 'react-native-draggable';
 
 export default function App() {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [draggableAreaHeight, setDraggableAreaHeight] = useState(0);
+
+  const setDraggableViewHeight = (event) => {
+    console.log("got layout: ", event.nativeEvent.layout);
+    setDraggableAreaHeight(event.nativeEvent.layout.height);
+  };
 
   function MenuItem({ index, imageSource }) {
     return (
@@ -40,7 +46,11 @@ export default function App() {
       renderSize={80} 
       x={Math.floor(key/5) * 80}
       y={(key * 80) % 400}
-      onDragRelease={()=>console.log('onDragRelease')}
+      minX={0}
+      minY={0}
+      maxX={Dimensions.get('window').width}
+      maxY={draggableAreaHeight}
+      onDragRelease={(event, gestureState)=>console.log('onDragRelease ', event, gestureState)}
       onLongPress={()=>console.log('long press')}
       onShortPressRelease={()=>console.log('press drag')}
       onPressIn={()=>console.log('in press')}
@@ -60,7 +70,7 @@ export default function App() {
         numColumns={3}
       />
       <Text>Draggable Area</Text>
-      <View style={styles.draggleArea}>
+      <View style={styles.draggleArea} onLayout={(event) => setDraggableViewHeight(event)}>
         {displayItems}
       </View>
     </SafeAreaView>
